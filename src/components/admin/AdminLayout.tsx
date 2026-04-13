@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   ShoppingBag,
+  Star,
   UtensilsCrossed,
   BarChart3,
   LogOut,
@@ -9,12 +10,13 @@ import {
   X,
   ChefHat,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
+
 
 const navItems = [
   { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/admin/orders", icon: ShoppingBag, label: "Orders" },
+  { path: "/admin/featured", icon: Star, label: "Featured" },
   { path: "/admin/menu", icon: UtensilsCrossed, label: "Menu" },
   { path: "/admin/analytics", icon: BarChart3, label: "Analytics" },
 ];
@@ -22,34 +24,10 @@ const navItems = [
 const AdminLayout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
-
-  useEffect(() => {
-    // Fetch pending count
-    const fetchPending = async () => {
-      const { count } = await supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-      setPendingCount(count ?? 0);
-    };
-    fetchPending();
-
-    // Subscribe to realtime changes
-    const channel = supabase
-      .channel("admin-layout-orders")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        () => fetchPending()
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    const { supabase: sb } = await import("@/lib/supabase");
+    await sb.auth.signOut();
     navigate("/admin/login");
   };
 
@@ -85,11 +63,6 @@ const AdminLayout = () => {
           >
             <Icon size={16} />
             <span className="flex-1">{label}</span>
-            {label === "Orders" && pendingCount > 0 && (
-              <span className="bg-primary text-primary-foreground text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
-                {pendingCount}
-              </span>
-            )}
           </NavLink>
         ))}
       </nav>
@@ -138,26 +111,24 @@ const AdminLayout = () => {
       {/* Main Content */}
       <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
         {/* Mobile Top Bar */}
-        <div className="lg:hidden sticky top-0 z-20 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center gap-3 border-b border-border/50">
+        <div className="lg:hidden sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 py-3 flex items-center gap-3 border-b border-border/50 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-xl hover:bg-secondary/50 transition-colors"
+            className="p-2 rounded-xl hover:bg-secondary/50 active:scale-[0.95] transition-all"
           >
             <Menu size={20} className="text-foreground" />
           </button>
           <div className="flex items-center gap-2">
-            <ChefHat size={16} className="text-primary" />
-            <p className="font-bold text-foreground text-sm">Cravings Spot Admin</p>
+            <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
+              <ChefHat size={13} className="text-primary-foreground" />
+            </div>
+            <p className="font-bold text-foreground text-sm">Cravings Spot</p>
           </div>
-          {pendingCount > 0 && (
-            <span className="ml-auto bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
-              {pendingCount} pending
-            </span>
-          )}
+          <span className="text-xs text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-full ml-1">Admin</span>
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 lg:p-8 max-w-7xl w-full mx-auto pb-6">
           <Outlet />
         </main>
       </div>

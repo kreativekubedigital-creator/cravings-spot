@@ -69,6 +69,33 @@ CREATE POLICY "Allow authenticated full access availability"
 -- 6. Enable Realtime for orders table
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
 
+-- 7. Featured items table (Promos)
+CREATE TABLE IF NOT EXISTS featured_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  main_price INTEGER NOT NULL,
+  discounted_price INTEGER NOT NULL,
+  image_url TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true
+);
+
+ALTER TABLE featured_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow anon read featured items"
+  ON featured_items FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "Allow authenticated full access featured items"
+  ON featured_items FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE featured_items;
+
 -- ============================================
 -- DONE! Now create an admin user:
 -- Go to Authentication → Users → Add User

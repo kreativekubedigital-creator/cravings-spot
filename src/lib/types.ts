@@ -6,6 +6,17 @@ export type OrderStatus =
   | "delivered"
   | "cancelled";
 
+export interface FeaturedItem {
+  id: string;
+  created_at: string;
+  title: string;
+  description: string | null;
+  main_price: number;
+  discounted_price: number;
+  image_url: string | null;
+  is_active: boolean;
+}
+
 export interface OrderItem {
   id: string;
   name: string;

@@ -23,6 +23,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminMenu from "./pages/admin/AdminMenu";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminFeatured from "./pages/admin/AdminFeatured";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ProtectedRoute from "@/components/admin/ProtectedRoute";
 
@@ -97,6 +98,7 @@ const App = () => (
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="orders" element={<AdminOrders />} />
+              <Route path="featured" element={<AdminFeatured />} />
               <Route path="menu" element={<AdminMenu />} />
               <Route path="analytics" element={<AdminAnalytics />} />
             </Route>

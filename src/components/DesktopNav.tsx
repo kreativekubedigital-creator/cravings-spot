@@ -1,11 +1,11 @@
-import { Home, UtensilsCrossed, ClipboardList } from "lucide-react";
+import { Home, UtensilsCrossed, Star } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const navItems = [
   { id: "/", label: "Home", icon: Home },
   { id: "/menu", label: "Menu", icon: UtensilsCrossed },
-  { id: "/orders", label: "Orders", icon: ClipboardList },
+  { id: "/featured", label: "Featured", icon: Star },
 ];
 
 const DesktopNav = () => {
