@@ -53,6 +53,14 @@ const CheckoutPage = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [sending, setSending] = useState(false);
 
+  // Generate a unique short order code
+  const generateOrderCode = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return `CS-${code}`;
+  };
+
   const finalTotal = deliveryOption === "delivery" ? totalPrice + DELIVERY_FEE : totalPrice;
 
   if (items.length === 0) {
@@ -66,8 +74,9 @@ const CheckoutPage = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const buildWhatsAppMessage = () => {
-    let msg = `🍽️ *New Order — Cravings Spot*\n\n`;
+  const buildWhatsAppMessage = (orderCode: string) => {
+    let msg = `🍽️ *New Order — Cravings Spot*\n`;
+    msg += `📋 *Order: ${orderCode}*\n\n`;
     msg += `👤 *Name:* ${customerName}\n`;
     msg += `📞 *Phone:* ${customerPhone}\n`;
     msg += `🚗 *${deliveryOption === "delivery" ? "Delivery" : "Pickup"}*\n`;
@@ -88,10 +97,12 @@ const CheckoutPage = () => {
 
   const handleSendWhatsApp = async () => {
     setSending(true);
+    const orderCode = generateOrderCode();
 
     // Save order to Supabase
     try {
       await supabase.from("orders").insert({
+        order_code: orderCode,
         customer_name: customerName,
         customer_phone: customerPhone,
         delivery_type: deliveryOption,
@@ -115,9 +126,9 @@ const CheckoutPage = () => {
     }
 
     // Open WhatsApp
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMessage()}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMessage(orderCode)}`;
     window.open(url, "_blank");
-    navigate("/thank-you", { state: { totalPrice: finalTotal, customerName } });
+    navigate("/thank-you", { state: { totalPrice: finalTotal, customerName, orderCode } });
   };
 
   const canProceedStep0 =

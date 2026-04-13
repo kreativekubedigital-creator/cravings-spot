@@ -28,6 +28,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   created_at: string;
+  order_code: string;
   customer_name: string;
   customer_phone: string;
   delivery_type: "pickup" | "delivery";

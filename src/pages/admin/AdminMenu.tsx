@@ -70,7 +70,7 @@ const AdminMenu = () => {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Menu Manager</h1>
+        <h1 className="text-xl font-bold text-foreground">Menu Manager</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Toggle items on or off to mark them available or sold out.
         </p>
@@ -104,7 +104,7 @@ const AdminMenu = () => {
       </div>
 
       {/* Category Filter */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
         <button
           onClick={() => setSelectedCategory("all")}
           className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${

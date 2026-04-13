@@ -7,7 +7,7 @@ const formatPrice = (n: number) => `₦${n.toLocaleString()}`;
 const ThankYouPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { totalPrice, customerName } = (location.state as { totalPrice?: number; customerName?: string }) || {};
+  const { totalPrice, customerName, orderCode } = (location.state as { totalPrice?: number; customerName?: string; orderCode?: string }) || {};
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -51,6 +51,12 @@ const ThankYouPage = () => {
             <div className="mt-3 inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full">
               <span className="text-xs text-muted-foreground">Total Paid</span>
               <span className="text-sm font-bold text-primary">{formatPrice(totalPrice)}</span>
+            </div>
+          )}
+          {orderCode && (
+            <div className="mt-2 inline-flex items-center gap-1.5 bg-secondary/40 border border-border px-3 py-1.5 rounded-full">
+              <span className="text-xs text-muted-foreground">Order Code</span>
+              <span className="text-sm font-mono font-bold text-primary">{orderCode}</span>
             </div>
           )}
         </div>

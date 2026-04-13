@@ -158,7 +158,7 @@ const AdminFeatured = () => {
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
             <Star size={20} className="text-primary" />
             Featured Items
           </h1>

@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
   MessageCircle,
+  Send,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
@@ -82,15 +83,41 @@ const AdminOrders = () => {
       .eq("id", id);
   };
 
-  const openWhatsApp = (phone: string, name: string) => {
+  const formatPhone = (phone: string) => {
     const cleanPhone = phone.replace(/\D/g, "");
-    const intlPhone = cleanPhone.startsWith("0")
+    return cleanPhone.startsWith("0")
       ? "234" + cleanPhone.slice(1)
       : cleanPhone;
+  };
+
+  const openWhatsApp = (phone: string, name: string, orderCode: string) => {
+    const intlPhone = formatPhone(phone);
     const msg = encodeURIComponent(
-      `Hi ${name}! This is Cravings Spot. Regarding your order — `
+      `Hi ${name}! This is Cravings Spot. Regarding your order ${orderCode} — `
     );
     window.open(`https://wa.me/${intlPhone}?text=${msg}`, "_blank");
+  };
+
+  const notifyCustomer = (order: Order) => {
+    const intlPhone = formatPhone(order.customer_phone);
+    const code = order.order_code || 'your order';
+    let msg = '';
+
+    if (order.status === 'ready' && order.delivery_type === 'pickup') {
+      msg = `Hi ${order.customer_name}! 🎉 Your order *${code}* is ready for pickup! Come grab it while it's hot 🔥\n\nThank you for choosing Cravings Spot — we can't wait to serve you again! 💛`;
+    } else if (order.status === 'delivered') {
+      msg = `Hi ${order.customer_name}! ✅ Your order *${code}* has been delivered! We hope you enjoy every bite 😋\n\nThank you for choosing Cravings Spot — order again soon! 💛🍽️`;
+    } else if (order.status === 'confirmed') {
+      msg = `Hi ${order.customer_name}! 👍 Your order *${code}* has been confirmed! We're getting it ready for you 🔥\n\n— Cravings Spot 💛`;
+    } else if (order.status === 'preparing') {
+      msg = `Hi ${order.customer_name}! 👨‍🍳 Your order *${code}* is being prepared now! Sit tight 😋\n\n— Cravings Spot 💛`;
+    } else if (order.status === 'ready' && order.delivery_type === 'delivery') {
+      msg = `Hi ${order.customer_name}! 🚚 Your order *${code}* is ready and on its way to you! 🔥\n\nThank you for choosing Cravings Spot 💛`;
+    } else {
+      msg = `Hi ${order.customer_name}! This is Cravings Spot. Your order *${code}* update — `;
+    }
+
+    window.open(`https://wa.me/${intlPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   // Filtering
@@ -112,9 +139,9 @@ const AdminOrders = () => {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Orders</h1>
+        <h1 className="text-xl font-bold text-foreground">Orders</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage and track all customer orders
         </p>
@@ -136,7 +163,7 @@ const AdminOrders = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
         {FILTER_TABS.map((tab) => {
           const count =
             tab.value === "all"
@@ -188,6 +215,11 @@ const AdminOrders = () => {
                       <p className="font-semibold text-foreground text-sm truncate">
                         {order.customer_name}
                       </p>
+                      {order.order_code && (
+                        <span className="text-[10px] font-mono font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                          {order.order_code}
+                        </span>
+                      )}
                       <span
                         className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                           STATUS_COLORS[order.status]
@@ -233,7 +265,8 @@ const AdminOrders = () => {
                         onClick={() =>
                           openWhatsApp(
                             order.customer_phone,
-                            order.customer_name
+                            order.customer_name,
+                            order.order_code || ''
                           )
                         }
                         className="flex items-center gap-1.5 bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-[#25D366]/20 transition-colors"
@@ -335,12 +368,23 @@ const AdminOrders = () => {
                         order.status !== "delivered" && (
                           <button
                             onClick={() => cancelOrder(order.id)}
-                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition-all ml-auto"
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition-all"
                           >
                             <XCircle size={13} />
                             Cancel
                           </button>
                         )}
+
+                      {/* Notify Customer */}
+                      {(order.status === 'confirmed' || order.status === 'preparing' || order.status === 'ready' || order.status === 'delivered') && (
+                        <button
+                          onClick={() => notifyCustomer(order)}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all ml-auto"
+                        >
+                          <Send size={12} />
+                          Notify Customer
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
