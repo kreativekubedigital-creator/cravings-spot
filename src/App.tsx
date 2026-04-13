@@ -58,7 +58,7 @@ const AppLayout = () => {
               element={
                 <>
                   <HeroBanner compact />
-                  <OrdersPage />
+                  <OrdersPage cart={cart} />
                 </>
               }
             />

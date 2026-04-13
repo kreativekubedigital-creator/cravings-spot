@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Search, Package, Clock, CheckCircle2, XCircle, ChefHat, Truck, MapPin, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Order, STATUS_LABELS } from "@/lib/types";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { MenuItem } from "@/data/menuData";
 
 const formatPrice = (n: number) => `₦${n.toLocaleString()}`;
 
@@ -23,8 +24,9 @@ const STATUS_INDEX: Record<string, number> = {
   cancelled: -1,
 };
 
-const OrdersPage = () => {
+const OrdersPage = ({ cart }: { cart?: any }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const prefilled = (location.state as { orderCode?: string })?.orderCode || "";
 
   const [code, setCode] = useState(prefilled);
@@ -61,6 +63,28 @@ const OrdersPage = () => {
 
   const currentStep = order ? STATUS_INDEX[order.status] ?? -1 : -1;
   const isCancelled = order?.status === "cancelled";
+
+  const handleReorder = () => {
+    if (!order || !cart) return;
+    
+    // Add all items from the past order into the cart
+    order.items.forEach((item) => {
+      const reconstructed: MenuItem = {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image || "",
+        description: "",
+        calories: 0,
+        category: "reorder",
+        diet: "non-veg",
+      };
+      cart.addItem(reconstructed, item.quantity);
+    });
+
+    // Navigate to checkout
+    navigate("/checkout");
+  };
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto pb-28">
@@ -278,6 +302,20 @@ const OrdersPage = () => {
                 <span className="text-sm text-amber-400 font-medium">Payment Pending</span>
               </>
             )}
+          </div>
+
+          {/* Reorder Action */}
+          <div className="pt-2">
+            <button
+              onClick={handleReorder}
+              className="w-full flex items-center justify-center gap-2 px-5 py-4 bg-primary text-primary-foreground rounded-xl text-sm font-bold shadow-lg hover:brightness-110 active:scale-[0.98] transition-all gold-glow"
+            >
+              <Package size={16} />
+              Re-order this exact cart
+            </button>
+            <p className="text-xs text-center text-muted-foreground mt-3">
+              Delivery options can be changed at checkout.
+            </p>
           </div>
         </div>
       )}

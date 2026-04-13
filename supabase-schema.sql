@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS orders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
-  order_code TEXT,
+  order_code TEXT UNIQUE,
   customer_name TEXT NOT NULL,
   customer_phone TEXT NOT NULL,
   delivery_type TEXT NOT NULL DEFAULT 'pickup',
