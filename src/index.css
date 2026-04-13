@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 20 12% 7%;
+    --foreground: 40 10% 92%;
+
+    --card: 20 10% 12%;
+    --card-foreground: 40 10% 92%;
+
+    --popover: 20 10% 10%;
+    --popover-foreground: 40 10% 92%;
+
+    --primary: 24 90% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 20 8% 16%;
+    --secondary-foreground: 40 10% 80%;
+
+    --muted: 20 8% 14%;
+    --muted-foreground: 20 8% 50%;
+
+    --accent: 24 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 10% 18%;
+    --input: 20 10% 16%;
+    --ring: 24 90% 55%;
+
+    --radius: 0.75rem;
+
+    --gold: 43 85% 55%;
+    --gold-dim: 43 60% 40%;
+    --gold-glow: 43 90% 65%;
+    --surface-elevated: 20 10% 14%;
+    --surface-overlay: 20 12% 5%;
+
+    --glass: 20 10% 15%;
+    --glass-border: 20 10% 22%;
+
+    --sidebar-background: 20 12% 7%;
+    --sidebar-foreground: 40 10% 92%;
+    --sidebar-primary: 24 90% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 20 8% 16%;
+    --sidebar-accent-foreground: 40 10% 92%;
+    --sidebar-border: 20 10% 18%;
+    --sidebar-ring: 24 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+  .font-sans {
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  .gold-glow {
+    box-shadow: 0 0 20px hsl(24 90% 55% / 0.2);
+  }
+  .gold-text-glow {
+    text-shadow: 0 0 12px hsl(24 90% 55% / 0.3);
+  }
+  .glass {
+    background: hsl(var(--glass) / 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border) / 0.4);
+  }
+  .glass-strong {
+    background: hsl(var(--glass) / 0.7);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid hsl(var(--glass-border) / 0.5);
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
