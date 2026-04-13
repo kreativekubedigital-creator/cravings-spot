@@ -10,7 +10,7 @@ const HomePage = () => {
     hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-end overflow-hidden">
+    <div className="fixed inset-0 flex flex-col justify-end overflow-hidden overflow-y-hidden touch-none bg-black">
       {/* Full-screen hero image */}
       <img
         src={heroSplash}
@@ -33,18 +33,18 @@ const HomePage = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 px-6 pb-10 lg:pb-16 lg:px-12 max-w-2xl lg:max-w-4xl mx-auto w-full">
-        <p className="font-display italic text-primary/80 text-sm tracking-wide mb-2 lg:text-base">
+      <div className="relative z-10 px-6 pb-8 lg:pb-16 lg:px-12 max-w-2xl lg:max-w-4xl mx-auto w-full">
+        <p className="font-display italic text-primary/80 text-sm tracking-wide mb-1 lg:text-base">
           {greeting}
         </p>
 
-        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-4 drop-shadow-lg">
+        <h1 className="font-display text-[2rem] sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-2 sm:mb-4 drop-shadow-lg">
           From <span className="text-primary gold-text-glow">Jollof</span> to
           Pizza, We've Got Your{" "}
           <span className="text-primary gold-text-glow">Cravings</span>
         </h1>
 
-        <p className="text-sm sm:text-base text-white/70 max-w-md mb-8 lg:mb-10 leading-relaxed drop-shadow-sm">
+        <p className="text-xs sm:text-base text-white/70 max-w-md mb-6 lg:mb-10 leading-relaxed drop-shadow-sm">
           Pancakes, shawarma, egusi soup, grilled chicken & more — freshly made and delivered fast across Lokoja.
         </p>
 
