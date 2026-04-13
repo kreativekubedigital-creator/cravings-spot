@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, Star } from "lucide-react";
+import { Home, ShoppingBag, Star, Package } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface BottomNavProps {
@@ -49,6 +49,7 @@ const BottomNav = ({ onCartOpen, cartCount = 0 }: BottomNavProps) => {
 
           {[
             { id: "/featured", label: "Featured", icon: Star },
+            { id: "/orders", label: "Track", icon: Package },
           ].map((tab) => {
             const isActive = location.pathname === tab.id;
             const Icon = tab.icon;

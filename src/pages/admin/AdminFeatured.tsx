@@ -11,6 +11,7 @@ import {
   Tag,
   AlertCircle,
   Loader2,
+  Upload,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { FeaturedItem } from "@/lib/types";
@@ -37,6 +38,7 @@ const AdminFeatured = () => {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uploadingImg, setUploadingImg] = useState(false);
 
   const fetchItems = async () => {
     const { data } = await supabase
@@ -86,6 +88,40 @@ const AdminFeatured = () => {
     setEditingId(null);
     setForm(EMPTY_FORM);
     setError(null);
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploadingImg(true);
+      setError(null);
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error("You must select an image to upload.");
+      }
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("featured-images")
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("featured-images")
+        .getPublicUrl(filePath);
+
+      setForm((f) => ({ ...f, image_url: publicUrl }));
+    } catch (error: any) {
+        setError(error.message);
+    } finally {
+      setUploadingImg(false);
+    }
   };
 
   const validate = (): string | null => {
@@ -457,25 +493,40 @@ const AdminFeatured = () => {
                   </div>
                 )}
 
-              {/* Image URL */}
+              {/* Image URL / Upload */}
               <div>
                 <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                  Image URL
+                  Image
                 </label>
-                <div className="relative">
-                  <ImageIcon
-                    size={13}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  />
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    value={form.image_url}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, image_url: e.target.value }))
-                    }
-                    className="w-full pl-8 pr-3 py-2.5 bg-secondary/40 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                  />
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <ImageIcon
+                      size={13}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <input
+                      type="url"
+                      placeholder="Image URL or upload..."
+                      value={form.image_url}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, image_url: e.target.value }))
+                      }
+                      className="w-full pl-8 pr-3 py-2.5 bg-secondary/40 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    />
+                  </div>
+                  <div className="relative flex-shrink-0">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImg}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                    />
+                    <div className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border transition-all h-full ${uploadingImg ? 'bg-secondary text-muted-foreground border-border' : 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'}`}>
+                      {uploadingImg ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                      <span className="hidden sm:inline">{uploadingImg ? 'Uploading...' : 'Upload'}</span>
+                    </div>
+                  </div>
                 </div>
                 {form.image_url && (
                   <div className="mt-2 rounded-xl overflow-hidden h-24 bg-secondary/30 border border-border/50">

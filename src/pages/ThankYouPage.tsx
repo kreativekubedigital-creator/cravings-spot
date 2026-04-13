@@ -105,23 +105,35 @@ const ThankYouPage = () => {
         </div>
 
         {/* CTAs */}
-        <div className="flex gap-3">
-          <button
-            id="thank-you-home-btn"
-            onClick={() => navigate("/")}
-            className="flex-1 glass-strong py-3.5 rounded-xl text-sm font-semibold text-foreground flex items-center justify-center gap-2 hover:bg-secondary/60 transition-colors"
-          >
-            <Home size={16} />
-            Home
-          </button>
-          <button
-            id="thank-you-order-more-btn"
-            onClick={() => navigate("/menu")}
-            className="flex-1 bg-primary text-primary-foreground py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 gold-glow hover:brightness-110 active:scale-[0.98] transition-all"
-          >
-            <UtensilsCrossed size={16} />
-            Order More
-          </button>
+        <div className="space-y-3">
+          {orderCode && (
+            <button
+              id="thank-you-track-btn"
+              onClick={() => navigate("/orders", { state: { orderCode } })}
+              className="w-full glass-strong py-3.5 rounded-xl text-sm font-semibold text-primary flex items-center justify-center gap-2 hover:bg-primary/10 border border-primary/20 transition-all"
+            >
+              <Package size={16} />
+              Track Your Order
+            </button>
+          )}
+          <div className="flex gap-3">
+            <button
+              id="thank-you-home-btn"
+              onClick={() => navigate("/")}
+              className="flex-1 glass-strong py-3.5 rounded-xl text-sm font-semibold text-foreground flex items-center justify-center gap-2 hover:bg-secondary/60 transition-colors"
+            >
+              <Home size={16} />
+              Home
+            </button>
+            <button
+              id="thank-you-order-more-btn"
+              onClick={() => navigate("/menu")}
+              className="flex-1 bg-primary text-primary-foreground py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 gold-glow hover:brightness-110 active:scale-[0.98] transition-all"
+            >
+              <UtensilsCrossed size={16} />
+              Order More
+            </button>
+          </div>
         </div>
       </div>
     </div>

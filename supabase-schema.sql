@@ -97,6 +97,27 @@ CREATE POLICY "Allow authenticated full access featured items"
 
 ALTER PUBLICATION supabase_realtime ADD TABLE featured_items;
 
+-- 8. Create Storage Bucket for Featured Images
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('featured-images', 'featured-images', true) 
+ON CONFLICT (id) DO NOTHING;
+
+-- RLS for storage (Allow public access to read, allow authenticated to insert/delete)
+CREATE POLICY "Public full access to featured-images"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'featured-images');
+
+CREATE POLICY "Authenticated users can upload to featured-images" 
+ON storage.objects FOR INSERT 
+TO authenticated 
+WITH CHECK (bucket_id = 'featured-images');
+
+CREATE POLICY "Authenticated users can delete from featured-images"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (bucket_id = 'featured-images');
+
 -- ============================================
 -- DONE! Now create an admin user:
 -- Go to Authentication → Users → Add User
