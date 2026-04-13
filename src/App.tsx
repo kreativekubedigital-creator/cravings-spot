@@ -8,6 +8,7 @@ import MenuPage from "./pages/MenuPage";
 import OrdersPage from "./pages/OrdersPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
+import FeaturedPage from "./pages/FeaturedPage";
 import NotFound from "./pages/NotFound";
 import DesktopNav from "@/components/DesktopNav";
 import BottomNav from "@/components/BottomNav";
@@ -63,6 +64,7 @@ const AppLayout = () => {
             />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/thank-you" element={<ThankYouPage />} />
+            <Route path="/featured" element={<FeaturedPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
