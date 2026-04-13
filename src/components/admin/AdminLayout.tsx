@@ -9,8 +9,12 @@ import {
   Menu,
   X,
   ChefHat,
+  Bell,
+  BellOff,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { playNotificationSound } from "@/lib/audio";
 
 
 const navItems = [
@@ -24,10 +28,58 @@ const navItems = [
 const AdminLayout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  useEffect(() => {
+    // Check permission on mount
+    if ("Notification" in window && Notification.permission === "granted") {
+      setNotificationsEnabled(true);
+    }
+
+    const channel = supabase
+      .channel("admin-global-orders")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "orders" },
+        (payload) => {
+          if (notificationsEnabled || Notification.permission === "granted") {
+             playNotificationSound();
+             const order = payload.new;
+             if ("Notification" in window && Notification.permission === "granted") {
+               new Notification("New Order Received! 🔥", {
+                 body: `${order.customer_name} placed a new order (${order.order_code || 'N/A'}).`,
+                 icon: "/favicon.ico" // optional if you have one
+               });
+             }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [notificationsEnabled]);
+
+  const toggleNotifications = async () => {
+    if (!("Notification" in window)) {
+      alert("Your browser does not support desktop notifications.");
+      return;
+    }
+
+    if (!notificationsEnabled) {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        setNotificationsEnabled(true);
+        playNotificationSound(); // Demo preview
+      }
+    } else {
+      setNotificationsEnabled(false);
+    }
+  };
 
   const handleLogout = async () => {
-    const { supabase: sb } = await import("@/lib/supabase");
-    await sb.auth.signOut();
+    await supabase.auth.signOut();
     navigate("/admin/login");
   };
 
@@ -67,11 +119,31 @@ const AdminLayout = () => {
         ))}
       </nav>
 
+      {/* Notifications toggle */}
+      <div className="px-3 pt-3 border-t border-border/50 flex-shrink-0">
+        <button
+          onClick={toggleNotifications}
+          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all w-full hover:bg-secondary/60"
+        >
+          <div className="flex items-center gap-3">
+             {notificationsEnabled ? (
+               <Bell size={17} className="text-primary flex-shrink-0" />
+             ) : (
+               <BellOff size={17} className="text-muted-foreground flex-shrink-0" />
+             )}
+             <span className={notificationsEnabled ? "text-foreground" : "text-muted-foreground"}>Alerts</span>
+          </div>
+          <div className={`w-8 h-4 rounded-full flex items-center p-0.5 transition-colors ${notificationsEnabled ? 'bg-primary' : 'bg-secondary border border-border'}`}>
+             <div className={`w-3 h-3 bg-white rounded-full shadow-sm transition-transform ${notificationsEnabled ? 'translate-x-4' : 'translate-x-0'}`} />
+          </div>
+        </button>
+      </div>
+
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-border/50 flex-shrink-0">
+      <div className="px-3 py-2 flex-shrink-0">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-all w-full"
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-all w-full"
         >
           <LogOut size={17} className="flex-shrink-0" />
           <span>Logout</span>
