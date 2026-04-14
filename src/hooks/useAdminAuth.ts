@@ -4,22 +4,58 @@ import { supabase } from "@/lib/supabase";
 
 export function useAdminAuth() {
   const [session, setSession] = useState<Session | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+    let active = true;
+
+    const fetchSessionAndRole = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        if (active) {
+          setSession(null);
+          setRole(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // Fetch role
+      const { data } = await supabase
+        .from('admin_roles')
+        .select('role')
+        .eq('email', session.user.email)
+        .maybeSingle();
+
+      if (active) {
+        setSession(session);
+        setRole(data?.role || 'superadmin'); // default fallback if needed temporarily
+        setLoading(false);
+      }
+    };
+
+    fetchSessionAndRole();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      if (session) {
+        // Just refetch entirely to get role again
+        fetchSessionAndRole();
+      } else {
+        setSession(null);
+        setRole(null);
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  return { session, loading, isAdmin: !!session };
+  return { session, role, loading, isAdmin: !!session };
 }

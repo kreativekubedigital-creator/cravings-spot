@@ -1,8 +1,19 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { createContext, useContext } from "react";
+import { Session } from "@supabase/supabase-js";
+
+interface AdminContextType {
+  session: Session | null;
+  role: string | null;
+}
+
+export const AdminContext = createContext<AdminContextType>({ session: null, role: null });
+
+export const useAdmin = () => useContext(AdminContext);
 
 const ProtectedRoute = () => {
-  const { session, loading } = useAdminAuth();
+  const { session, role, loading } = useAdminAuth();
 
   if (loading) {
     return (
@@ -19,7 +30,22 @@ const ProtectedRoute = () => {
     return <Navigate to="/admin/login" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <AdminContext.Provider value={{ session, role }}>
+      <Outlet />
+    </AdminContext.Provider>
+  );
+};
+
+export const RoleRestricted = ({ allowedRoles, children }: { allowedRoles: string[], children: React.ReactNode }) => {
+  const { role, loading } = useAdmin();
+  
+  if (loading) return null;
+  // If role isn't loaded or isn't in allowed Roles, bounce to dashboard
+  if (!role || !allowedRoles.includes(role)) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

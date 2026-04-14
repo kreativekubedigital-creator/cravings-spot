@@ -25,8 +25,10 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminMenu from "./pages/admin/AdminMenu";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminFeatured from "./pages/admin/AdminFeatured";
+import AdminTeam from "./pages/admin/AdminTeam";
+import AdminRegister from "./pages/admin/AdminRegister";
 import AdminLayout from "@/components/admin/AdminLayout";
-import ProtectedRoute from "@/components/admin/ProtectedRoute";
+import ProtectedRoute, { RoleRestricted } from "@/components/admin/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -95,14 +97,41 @@ const App = () => (
         <Routes>
           {/* Admin routes — separate from main layout */}
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/register" element={<AdminRegister />} />
+          
           <Route path="/admin" element={<ProtectedRoute />}>
             <Route element={<AdminLayout />}>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="orders" element={<AdminOrders />} />
-              <Route path="featured" element={<AdminFeatured />} />
-              <Route path="menu" element={<AdminMenu />} />
-              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="dashboard" element={
+                <RoleRestricted allowedRoles={["superadmin", "order_admin", "menu_admin"]}>
+                  <AdminDashboard />
+                </RoleRestricted>
+              } />
+              <Route path="orders" element={
+                <RoleRestricted allowedRoles={["superadmin", "order_admin"]}>
+                  <AdminOrders />
+                </RoleRestricted>
+              } />
+              <Route path="featured" element={
+                <RoleRestricted allowedRoles={["superadmin", "menu_admin"]}>
+                  <AdminFeatured />
+                </RoleRestricted>
+              } />
+              <Route path="menu" element={
+                <RoleRestricted allowedRoles={["superadmin", "menu_admin"]}>
+                  <AdminMenu />
+                </RoleRestricted>
+              } />
+              <Route path="analytics" element={
+                <RoleRestricted allowedRoles={["superadmin"]}>
+                  <AdminAnalytics />
+                </RoleRestricted>
+              } />
+              <Route path="team" element={
+                <RoleRestricted allowedRoles={["superadmin"]}>
+                  <AdminTeam />
+                </RoleRestricted>
+              } />
             </Route>
           </Route>
 

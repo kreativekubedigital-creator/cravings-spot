@@ -11,24 +11,34 @@ import {
   ChefHat,
   Bell,
   BellOff,
+  Users,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { playNotificationSound } from "@/lib/audio";
+import { useAdmin } from "./ProtectedRoute";
 
+type Role = "superadmin" | "order_admin" | "menu_admin";
 
 const navItems = [
-  { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { path: "/admin/orders", icon: ShoppingBag, label: "Orders" },
-  { path: "/admin/featured", icon: Star, label: "Featured" },
-  { path: "/admin/menu", icon: UtensilsCrossed, label: "Menu" },
-  { path: "/admin/analytics", icon: BarChart3, label: "Analytics" },
+  { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard", allowedRoles: ["superadmin", "order_admin", "menu_admin"] },
+  { path: "/admin/orders", icon: ShoppingBag, label: "Orders", allowedRoles: ["superadmin", "order_admin"] },
+  { path: "/admin/featured", icon: Star, label: "Featured", allowedRoles: ["superadmin", "menu_admin"] },
+  { path: "/admin/menu", icon: UtensilsCrossed, label: "Menu", allowedRoles: ["superadmin", "menu_admin"] },
+  { path: "/admin/analytics", icon: BarChart3, label: "Analytics", allowedRoles: ["superadmin"] },
+  { path: "/admin/team", icon: Users, label: "Team", allowedRoles: ["superadmin"] },
 ];
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const { role } = useAdmin();
+  const safeRole = role || "superadmin";
+
+  const permittedNavItems = navItems.filter((item) =>
+    item.allowedRoles.includes(safeRole)
+  );
 
   useEffect(() => {
     // Check permission on mount
@@ -100,7 +110,7 @@ const AdminLayout = () => {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ path, icon: Icon, label }) => (
+        {permittedNavItems.map(({ path, icon: Icon, label }) => (
           <NavLink
             key={path}
             to={path}

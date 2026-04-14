@@ -29,6 +29,26 @@ CREATE TABLE IF NOT EXISTS menu_availability (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- 3. Admin Roles table (Role-Based Access Control)
+CREATE TABLE IF NOT EXISTS admin_roles (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  role TEXT NOT NULL DEFAULT 'order_admin',
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+ALTER TABLE admin_roles ENABLE ROW LEVEL SECURITY;
+
+-- Everyone can read roles
+CREATE POLICY "allow read roles" ON admin_roles FOR SELECT TO authenticated USING (true);
+-- Only superadmins can modify roles
+CREATE POLICY "allow insert roles" ON admin_roles FOR INSERT TO authenticated 
+WITH CHECK ( (SELECT role FROM admin_roles WHERE email = (auth.jwt() ->> 'email') LIMIT 1) = 'superadmin' );
+CREATE POLICY "allow update roles" ON admin_roles FOR UPDATE TO authenticated 
+USING ( (SELECT role FROM admin_roles WHERE email = (auth.jwt() ->> 'email') LIMIT 1) = 'superadmin' );
+CREATE POLICY "allow delete roles" ON admin_roles FOR DELETE TO authenticated 
+USING ( (SELECT role FROM admin_roles WHERE email = (auth.jwt() ->> 'email') LIMIT 1) = 'superadmin' );
+
 -- 3. Enable Row Level Security
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE menu_availability ENABLE ROW LEVEL SECURITY;
