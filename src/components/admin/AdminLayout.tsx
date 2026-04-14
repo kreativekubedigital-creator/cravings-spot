@@ -197,7 +197,17 @@ const AdminLayout = () => {
               </div>
               <p className="font-bold text-foreground text-sm truncate">Cravings Spot</p>
             </div>
-            <span className="text-xs text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-full ml-auto flex-shrink-0">Admin</span>
+            
+            <div className="flex items-center gap-3 ml-auto flex-shrink-0">
+              <span className="text-xs text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-full hidden sm:inline-block">Admin</span>
+              <button
+                onClick={handleLogout}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
           </div>
         </div>
 
