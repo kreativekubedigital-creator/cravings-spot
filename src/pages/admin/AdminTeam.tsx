@@ -17,11 +17,9 @@ const AdminTeam = () => {
   const [team, setTeam] = useState<AdminRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState("order_admin");
-
-  if (role !== "superadmin") {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchTeam = async () => {
     const { data, error } = await supabase
@@ -39,11 +37,55 @@ const AdminTeam = () => {
     fetchTeam();
   }, []);
 
+  if (role !== "superadmin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newEmail.trim()) return;
+    if (!newEmail.trim() || !newPassword.trim()) return;
+    
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
+      // Create a temporary Supabase client to sign up the new user 
+      // without logging out the current superadmin
+      const { createClient } = await import("@supabase/supabase-js");
+      const tempSupabase = createClient(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_ANON_KEY,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+          },
+        }
+      );
+
+      // 1. Sign up the user in Auth
+      const { error: signUpError } = await tempSupabase.auth.signUp({
+        email: newEmail.trim().toLowerCase(),
+        password: newPassword,
+      });
+
+      if (signUpError) {
+        if (signUpError.message.includes("already registered")) {
+           // We can still proceed to add them to admin_roles if they exist, or just fail
+           toast.error("This user is already registered. Trying to assign role...");
+        } else {
+           toast.error(signUpError.message);
+           setIsSubmitting(false);
+           return;
+        }
+      }
+
+      // 2. Add to admin_roles
       const { error } = await supabase
         .from("admin_roles")
         .insert([{ email: newEmail.trim().toLowerCase(), role: newRole }]);
@@ -52,16 +94,20 @@ const AdminTeam = () => {
         if (error.code === '23505') {
            toast.error("This email is already registered as an admin.");
         } else {
-           toast.error("Failed to add team member.");
+           toast.error("Failed to add team member role.");
         }
+        setIsSubmitting(false);
         return;
       }
 
-      toast.success("Team member added! They can now register via /admin/register");
+      toast.success("Team member added successfully! They can now log in.");
       setNewEmail("");
+      setNewPassword("");
       fetchTeam();
     } catch (err) {
       toast.error("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -123,6 +169,18 @@ const AdminTeam = () => {
                 />
               </div>
               <div>
+                <label className="text-xs font-medium text-foreground mb-1 block">Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  className="w-full px-3 py-2 bg-secondary/30 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              <div>
                 <label className="text-xs font-medium text-foreground mb-1 block">Role</label>
                 <select
                   value={newRole}
@@ -136,9 +194,14 @@ const AdminTeam = () => {
               </div>
               <button
                 type="submit"
-                className="w-full py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all"
+                disabled={isSubmitting}
+                className="w-full py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50 flex justify-center items-center h-10"
               >
-                Add Member
+                {isSubmitting ? (
+                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                ) : (
+                  "Add Member"
+                )}
               </button>
             </form>
           </div>

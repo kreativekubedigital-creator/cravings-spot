@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { CartItem } from "@/hooks/useCart";
 import {
   ChevronLeft,
@@ -64,8 +64,7 @@ const CheckoutPage = () => {
   const finalTotal = deliveryOption === "delivery" ? totalPrice + DELIVERY_FEE : totalPrice;
 
   if (items.length === 0) {
-    navigate("/menu");
-    return null;
+    return <Navigate to="/menu" replace />;
   }
 
   const handleCopy = () => {

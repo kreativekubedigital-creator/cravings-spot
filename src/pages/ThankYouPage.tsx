@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, UtensilsCrossed, Clock, CheckCircle2 } from "lucide-react";
+import { Home, UtensilsCrossed, Clock, CheckCircle2, Package } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const formatPrice = (n: number) => `₦${n.toLocaleString()}`;

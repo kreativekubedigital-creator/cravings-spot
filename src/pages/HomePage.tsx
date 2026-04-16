@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import heroSplash from "@/assets/hero-splash.jpg";
 import logo from "@/assets/logo.png";
 

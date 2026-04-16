@@ -31,18 +31,17 @@ const DesktopNav = () => {
       {/* Nav links */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.id || 
+          const isActive = location.pathname === item.id ||
             (item.id === "/" && location.pathname === "/menu");
           const Icon = item.icon;
           return (
             <button
               key={item.id}
               onClick={() => navigate(item.id)}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                isActive
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
+                }`}
             >
               <Icon size={18} strokeWidth={isActive ? 2.5 : 1.5} />
               {item.label}
