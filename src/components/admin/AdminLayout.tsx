@@ -21,12 +21,12 @@ import { useAdmin } from "./ProtectedRoute";
 type Role = "superadmin" | "order_admin" | "menu_admin";
 
 const navItems = [
-  { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard", allowedRoles: ["superadmin", "order_admin", "menu_admin"] },
-  { path: "/admin/orders", icon: ShoppingBag, label: "Orders", allowedRoles: ["superadmin", "order_admin"] },
-  { path: "/admin/featured", icon: Star, label: "Featured", allowedRoles: ["superadmin", "menu_admin"] },
-  { path: "/admin/menu", icon: UtensilsCrossed, label: "Menu", allowedRoles: ["superadmin", "menu_admin"] },
-  { path: "/admin/analytics", icon: BarChart3, label: "Analytics", allowedRoles: ["superadmin"] },
-  { path: "/admin/team", icon: Users, label: "Team", allowedRoles: ["superadmin"] },
+  { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard", allowedRoles: ["superadmin", "cravings_admin", "order_admin", "menu_admin"] },
+  { path: "/admin/orders", icon: ShoppingBag, label: "Orders", allowedRoles: ["superadmin", "cravings_admin", "order_admin"] },
+  { path: "/admin/featured", icon: Star, label: "Featured", allowedRoles: ["superadmin", "cravings_admin", "menu_admin"] },
+  { path: "/admin/menu", icon: UtensilsCrossed, label: "Menu", allowedRoles: ["superadmin", "cravings_admin", "menu_admin"] },
+  { path: "/admin/analytics", icon: BarChart3, label: "Analytics", allowedRoles: ["superadmin", "cravings_admin"] },
+  { path: "/admin/team", icon: Users, label: "Team", allowedRoles: ["superadmin", "cravings_admin"] },
 ];
 
 const AdminLayout = () => {

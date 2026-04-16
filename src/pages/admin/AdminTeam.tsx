@@ -37,7 +37,7 @@ const AdminTeam = () => {
     fetchTeam();
   }, []);
 
-  if (role !== "superadmin") {
+  if (role !== "superadmin" && role !== "cravings_admin") {
     return <Navigate to="/admin/dashboard" replace />;
   }
 
@@ -76,8 +76,7 @@ const AdminTeam = () => {
 
       if (signUpError) {
         if (signUpError.message.includes("already registered")) {
-           // We can still proceed to add them to admin_roles if they exist, or just fail
-           toast.error("This user is already registered. Trying to assign role...");
+           toast.error("User already registered. They must log in with their existing password. Assigning role...");
         } else {
            toast.error(signUpError.message);
            setIsSubmitting(false);
@@ -126,6 +125,7 @@ const AdminTeam = () => {
   const getRoleIcon = (roleName: string) => {
     switch (roleName) {
       case "superadmin": return <Shield size={16} className="text-purple-500" />;
+      case "cravings_admin": return <Shield size={16} className="text-pink-500" />;
       case "menu_admin": return <ChefHat size={16} className="text-amber-500" />;
       case "order_admin": default: return <ShoppingBag size={16} className="text-blue-500" />;
     }
@@ -134,6 +134,7 @@ const AdminTeam = () => {
   const getRoleLabel = (roleName: string) => {
     switch (roleName) {
       case "superadmin": return "Super Admin";
+      case "cravings_admin": return "Cravings Admin";
       case "menu_admin": return "Menu Manager";
       case "order_admin": default: return "Order Processor";
     }
@@ -148,10 +149,10 @@ const AdminTeam = () => {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-6 lg:items-start">
         {/* ADD STAFF FORM */}
         <div className="lg:col-span-1">
-          <div className="glass-strong rounded-2xl p-5 border border-border/50 sticky top-24">
+          <div className="glass-strong rounded-2xl p-5 border border-border/50 lg:sticky lg:top-24">
             <h2 className="text-sm font-bold text-foreground flex items-center gap-2 mb-4">
               <UserPlus size={16} className="text-primary" />
               Invite Team Member
@@ -185,11 +186,14 @@ const AdminTeam = () => {
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
-                  className="w-full px-3 py-2 bg-secondary/30 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
+                  className="w-full px-3 py-2 bg-secondary/30 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none text-foreground"
                 >
-                  <option value="order_admin">Order Processor (Orders only)</option>
-                  <option value="menu_admin">Menu Manager (Menu & Featured)</option>
-                  <option value="superadmin">Super Admin (Full Access)</option>
+                  <option value="order_admin" className="bg-background text-foreground">Order Processor</option>
+                  <option value="menu_admin" className="bg-background text-foreground">Menu Manager</option>
+                  <option value="cravings_admin" className="bg-background text-foreground">Cravings Admin: full Access to manage everything except super admin</option>
+                  {role === "superadmin" && (
+                    <option value="superadmin" className="bg-background text-foreground">Super Admin: Overall control</option>
+                  )}
                 </select>
               </div>
               <button
@@ -216,7 +220,9 @@ const AdminTeam = () => {
                <p className="text-muted-foreground text-sm">No team members found.</p>
             </div>
           ) : (
-            team.map((member) => (
+            team
+              .filter((member) => role === "superadmin" || member.role !== "superadmin")
+              .map((member) => (
               <div key={member.id} className="flex items-center justify-between p-4 bg-background rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">

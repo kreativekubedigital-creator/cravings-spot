@@ -103,32 +103,32 @@ const App = () => (
             <Route element={<AdminLayout />}>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={
-                <RoleRestricted allowedRoles={["superadmin", "order_admin", "menu_admin"]}>
+                <RoleRestricted allowedRoles={["superadmin", "cravings_admin", "order_admin", "menu_admin"]}>
                   <AdminDashboard />
                 </RoleRestricted>
               } />
               <Route path="orders" element={
-                <RoleRestricted allowedRoles={["superadmin", "order_admin"]}>
+                <RoleRestricted allowedRoles={["superadmin", "cravings_admin", "order_admin"]}>
                   <AdminOrders />
                 </RoleRestricted>
               } />
               <Route path="featured" element={
-                <RoleRestricted allowedRoles={["superadmin", "menu_admin"]}>
+                <RoleRestricted allowedRoles={["superadmin", "cravings_admin", "menu_admin"]}>
                   <AdminFeatured />
                 </RoleRestricted>
               } />
               <Route path="menu" element={
-                <RoleRestricted allowedRoles={["superadmin", "menu_admin"]}>
+                <RoleRestricted allowedRoles={["superadmin", "cravings_admin", "menu_admin"]}>
                   <AdminMenu />
                 </RoleRestricted>
               } />
               <Route path="analytics" element={
-                <RoleRestricted allowedRoles={["superadmin"]}>
+                <RoleRestricted allowedRoles={["superadmin", "cravings_admin"]}>
                   <AdminAnalytics />
                 </RoleRestricted>
               } />
               <Route path="team" element={
-                <RoleRestricted allowedRoles={["superadmin"]}>
+                <RoleRestricted allowedRoles={["superadmin", "cravings_admin"]}>
                   <AdminTeam />
                 </RoleRestricted>
               } />
