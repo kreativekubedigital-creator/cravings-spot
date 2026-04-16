@@ -190,7 +190,7 @@ const AdminTeam = () => {
                 >
                   <option value="order_admin" className="bg-background text-foreground">Order Processor</option>
                   <option value="menu_admin" className="bg-background text-foreground">Menu Manager</option>
-                  <option value="cravings_admin" className="bg-background text-foreground">Cravings Admin: full Access to manage everything except super admin</option>
+                  <option value="cravings_admin" className="bg-background text-foreground">Cravings Admin</option>
                   {role === "superadmin" && (
                     <option value="superadmin" className="bg-background text-foreground">Super Admin: Overall control</option>
                   )}
