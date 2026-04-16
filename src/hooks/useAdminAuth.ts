@@ -31,7 +31,10 @@ export function useAdminAuth() {
 
       if (active) {
         setSession(session);
-        setRole(data?.role || 'superadmin'); // default fallback if needed temporarily
+        // Normalize role to handle manual database entries like "Cravings Admin"
+        const rawRole = data?.role || 'superadmin';
+        const normalizedRole = rawRole.toLowerCase().trim().replace(/\s+/g, '_');
+        setRole(normalizedRole);
         setLoading(false);
       }
     };
