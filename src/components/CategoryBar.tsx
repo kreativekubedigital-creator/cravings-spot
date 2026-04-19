@@ -11,9 +11,8 @@ const CategoryBar = ({ active, onSelect }: CategoryBarProps) => {
 
   return (
     <div className="px-5 mb-5 lg:px-8">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-bold text-foreground">Popular Categories</h2>
-        <span className="text-xs text-primary font-medium">See all</span>
+      <div className="flex items-center mb-3">
+        <h2 className="text-lg font-bold text-foreground">Craving's Menu</h2>
       </div>
       <div
         ref={scrollRef}
