@@ -34,31 +34,41 @@ const HomePage = () => {
 
       {/* Content */}
       <div className="relative z-10 px-6 pb-8 lg:pb-16 lg:px-12 max-w-2xl lg:max-w-4xl mx-auto w-full">
-        <p className="font-display italic text-primary/80 text-sm tracking-wide mb-1 lg:text-base">
+        {/* Subtle glow behind text to help it pop without a visible box edge */}
+        <div className="absolute inset-0 bg-black/60 blur-[120px] -z-10 rounded-full scale-110 lg:scale-125 translate-y-1/4" />
+        
+        <p className="font-display italic text-primary text-sm tracking-widest mb-2 lg:text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
           {greeting}
         </p>
 
-        <h1 className="font-display text-[2rem] sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-2 sm:mb-4 drop-shadow-lg">
+        <h1 className="font-display text-[2.5rem] sm:text-5xl lg:text-7xl font-bold text-white leading-[1.1] mb-4 sm:mb-6 drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
           From <span className="text-primary gold-text-glow">Jollof</span> to
           Pizza, We've Got Your{" "}
           <span className="text-primary gold-text-glow">Cravings</span>
         </h1>
 
-        <p className="text-xs sm:text-base text-white/70 max-w-md mb-6 lg:mb-10 leading-relaxed drop-shadow-sm">
-          Pancakes, shawarma, egusi soup, grilled chicken & more — freshly made and delivered fast across Lokoja.
+        <p className="text-sm sm:text-lg text-white/95 max-w-lg mb-8 lg:mb-12 leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-medium">
+          Pancakes, shawarma, egusi soup, grilled chicken & more!{" "}
+          <br />
+          Freshly made and delivered fast across Lokoja.
         </p>
 
-        {/* CTA button — pill style like the reference */}
+        {/* CTA button — pill style with animation */}
         <button
           onClick={() => navigate("/menu")}
-          className="group flex items-center w-full max-w-sm bg-card/80 backdrop-blur-md border border-border rounded-full overflow-hidden hover:border-primary/40 transition-all"
+          className="group relative flex items-center w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 rounded-full overflow-hidden hover:bg-white/20 hover:border-primary/50 transition-all shadow-2xl animate-button-pulse"
         >
-          <span className="w-12 h-12" />
-          <span className="flex-1 text-center font-semibold text-foreground text-sm tracking-wide py-4">
-            Start Ordering
+          {/* Shimmer effect overlay */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
+          </div>
+
+          <span className="w-12 h-12 z-10" />
+          <span className="flex-1 text-center font-bold text-white text-base tracking-wide py-4 uppercase z-10">
+            Order Now
           </span>
-          <span className="flex items-center justify-center w-12 h-12 bg-primary/10 text-primary rounded-full m-1 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-            <ChevronRight size={18} />
+          <span className="flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-full m-1 group-hover:scale-110 transition-transform z-10 shadow-[0_0_15px_rgba(255,107,0,0.4)]">
+            <ChevronRight size={20} className="animate-arrow-glow" />
           </span>
         </button>
       </div>
