@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Star, Tag, ShoppingBag } from "lucide-react";
+import { Star, Tag, ShoppingBag, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { FeaturedItem } from "@/lib/types";
 
@@ -8,6 +8,7 @@ const formatPrice = (n: number) => `₦${n.toLocaleString()}`;
 const FeaturedPage = () => {
   const [items, setItems] = useState<FeaturedItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<FeaturedItem | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -75,7 +76,8 @@ const FeaturedPage = () => {
             return (
               <div
                 key={item.id}
-                className="glass-strong rounded-2xl border border-border/50 overflow-hidden group hover:border-primary/30 transition-all duration-300"
+                onClick={() => setSelectedItem(item)}
+                className="glass-strong rounded-2xl border border-border/50 overflow-hidden group hover:border-primary/30 transition-all duration-300 cursor-pointer"
               >
                 {/* Image */}
                 {item.image_url && (
@@ -106,7 +108,7 @@ const FeaturedPage = () => {
                   </div>
 
                   {item.description && (
-                    <p className="text-sm text-muted-foreground mb-3">
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {item.description}
                     </p>
                   )}
@@ -136,6 +138,7 @@ const FeaturedPage = () => {
                 <div className="px-4 pb-4">
                   <a
                     href="/menu"
+                    onClick={(e) => e.stopPropagation()}
                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:brightness-110 active:scale-[0.98] transition-all"
                   >
                     <ShoppingBag size={15} />
@@ -145,6 +148,76 @@ const FeaturedPage = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Item Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-background/80 backdrop-blur-md animate-in fade-in duration-300"
+            onClick={() => setSelectedItem(null)}
+          />
+          <div className="relative w-full max-w-lg glass-strong border border-border/50 rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-300">
+            <button
+              onClick={() => setSelectedItem(null)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-background/50 backdrop-blur-md border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background/80 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            {selectedItem.image_url && (
+              <div className="h-64 sm:h-80 overflow-hidden">
+                <img
+                  src={selectedItem.image_url}
+                  alt={selectedItem.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            <div className="p-6 sm:p-8">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="bg-primary/15 text-primary text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-primary/20">
+                  Featured Deal
+                </div>
+                {selectedItem.main_price > selectedItem.discounted_price && (
+                  <div className="bg-green-500/15 text-green-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-green-500/20">
+                    Save {Math.round(((selectedItem.main_price - selectedItem.discounted_price) / selectedItem.main_price) * 100)}%
+                  </div>
+                )}
+              </div>
+
+              <h2 className="text-2xl font-bold text-foreground mb-3 leading-tight">
+                {selectedItem.title}
+              </h2>
+
+              {selectedItem.description && (
+                <p className="text-muted-foreground leading-relaxed mb-6 text-sm sm:text-base">
+                  {selectedItem.description}
+                </p>
+              )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-t border-border/50">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl font-bold text-primary">
+                    {formatPrice(selectedItem.discounted_price)}
+                  </span>
+                  <span className="text-base text-muted-foreground line-through opacity-60 font-medium">
+                    {formatPrice(selectedItem.main_price)}
+                  </span>
+                </div>
+                
+                <a
+                  href="/menu"
+                  className="flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
+                >
+                  <ShoppingBag size={18} />
+                  Order Now
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
