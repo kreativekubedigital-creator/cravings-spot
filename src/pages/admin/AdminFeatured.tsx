@@ -41,12 +41,29 @@ const AdminFeatured = () => {
   const [uploadingImg, setUploadingImg] = useState(false);
 
   const fetchItems = async () => {
-    const { data } = await supabase
-      .from("featured_items")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setItems((data as FeaturedItem[]) ?? []);
-    setLoading(false);
+    try {
+      const { data, error: err } = await supabase
+        .from("featured_items")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (err) {
+        console.error("Error fetching featured items:", err);
+        // If the table doesn't exist, Supabase returns a 404 or similar error
+        if (err.code === 'PGRST116' || err.message.includes('relation "public.featured_items" does not exist')) {
+          setError("Database table 'featured_items' not found. Please run the SQL schema in your Supabase dashboard.");
+        } else {
+          setError("Error fetching items: " + err.message);
+        }
+      } else {
+        setItems((data as FeaturedItem[]) ?? []);
+      }
+    } catch (e: any) {
+      console.error("Unexpected error fetching items:", e);
+      setError("Unexpected error: " + e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -155,28 +172,48 @@ const AdminFeatured = () => {
         .from("featured_items")
         .update(payload)
         .eq("id", editingId);
-      if (err) setError("Failed to update item.");
+      if (err) {
+        setError("Failed to update item: " + err.message);
+        setSaving(false);
+        return;
+      }
     } else {
       const { error: err } = await supabase
         .from("featured_items")
         .insert(payload);
-      if (err) setError("Failed to add item.");
+      if (err) {
+        setError("Failed to add item: " + err.message);
+        setSaving(false);
+        return;
+      }
     }
 
+    await fetchItems(); // Manual refresh in case realtime is slow
     setSaving(false);
-    if (!error) closeModal();
+    closeModal();
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("featured_items").delete().eq("id", id);
+    const { error: err } = await supabase.from("featured_items").delete().eq("id", id);
+    if (err) {
+      setError("Failed to delete item: " + err.message);
+    } else {
+      await fetchItems();
+    }
     setDeleteConfirmId(null);
   };
 
   const toggleActive = async (item: FeaturedItem) => {
-    await supabase
+    const { error: err } = await supabase
       .from("featured_items")
       .update({ is_active: !item.is_active })
       .eq("id", item.id);
+    
+    if (err) {
+      setError("Failed to toggle status: " + err.message);
+    } else {
+      await fetchItems();
+    }
   };
 
   const activeCount = items.filter((i) => i.is_active).length;
