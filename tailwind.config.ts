@@ -119,6 +119,7 @@ export default {
         "button-pulse": "button-pulse 3s ease-in-out infinite",
         "shimmer": "shimmer 4s infinite",
         "arrow-glow": "arrow-glow 2s ease-in-out infinite",
+        "bounce-slow": "bounce 3s ease-in-out infinite",
       },
     },
   },

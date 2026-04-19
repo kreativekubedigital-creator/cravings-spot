@@ -36,6 +36,8 @@ const AppLayout = () => {
   const cart = useCart();
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isCheckout = location.pathname === "/checkout";
+  const isThankYou = location.pathname === "/thank-you";
   const [cartOpen, setCartOpen] = useState(false);
 
   return (
@@ -72,7 +74,7 @@ const AppLayout = () => {
         </div>
       </div>
 
-      {!isHome && (
+      {!isHome && !isCheckout && !isThankYou && (
         <BottomNav onCartOpen={() => setCartOpen(true)} cartCount={cart.totalItems} />
       )}
 

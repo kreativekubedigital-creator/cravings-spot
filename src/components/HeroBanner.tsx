@@ -21,7 +21,7 @@ const HeroBanner = ({ compact }: HeroBannerProps) => {
   }
 
   return (
-    <div className="px-5 pt-20 pb-4 lg:px-8 lg:pt-6">
+    <div className="px-5 pt-6 pb-4 lg:px-8 lg:pt-6">
       {/* Top bar */}
       <div className="flex items-center justify-center mb-4">
         <div className="flex flex-col items-center">

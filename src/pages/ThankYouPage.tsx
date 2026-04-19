@@ -22,7 +22,7 @@ const ThankYouPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 py-12">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 py-8 pb-[env(safe-area-inset-bottom,2rem)]">
       <div
         className={`max-w-sm w-full text-center space-y-7 transition-all duration-700 ${
           visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
